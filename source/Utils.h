@@ -13,7 +13,34 @@ namespace dae
 		inline bool HitTest_Sphere(const Sphere& sphere, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false)
 		{
 			//todo W1
-			assert(false && "No Implemented Yet!");
+			//assert(false && "No Implemented Yet!");
+
+			//vector from ray origin to sphere origin
+			Vector3 tc{ sphere.origin - ray.origin };
+
+			//project the sphere origin on the ray
+			Vector3 p{ Vector3::Project(sphere.origin, ray.direction) };
+
+			//get the length of the sides of the formed triangle
+			float tcLength{ tc.Magnitude() };
+			float dp{ Vector3::Dot(tc, ray.direction) };
+			float od{ Square(tcLength) - Square(dp) };
+
+			//distance between intersect point and projected point
+			float tca{ sqrt(Square(sphere.radius) - od) };
+
+			//distance between ray origin and intersect point
+			float t0{ dp - tca };
+
+			//calculate intersect point
+			Vector3 l1{ ray.origin + (t0 * ray.direction) };
+
+			if (true)
+			{
+				hitRecord.t = t0;
+				hitRecord.didHit = true;
+			}
+
 			return false;
 		}
 

@@ -41,14 +41,23 @@ void Renderer::Render(Scene* pScene) const
 			Vector3 rayDirection{ cx,cy,camera.forward.z };
 			rayDirection.Normalize();
 
-			Ray hitRay{ {0,0,0},rayDirection };
-			ColorRGB finalColor{ rayDirection.x,rayDirection.y, rayDirection.z };
+			/*Ray hitRay{ {0,0,0},rayDirection };
+			ColorRGB finalColor{ rayDirection.x,rayDirection.y, rayDirection.z };*/
 
-			/*float gradient = px / static_cast<float>(m_Width);
-			gradient += py / static_cast<float>(m_Width);
-			gradient /= 2.0f;
+			Ray viewRay{ {0,0,0}, rayDirection };
 
-			ColorRGB finalColor{ gradient, gradient, gradient };*/
+			ColorRGB finalColor{};
+
+			HitRecord closestHit{};
+
+			Sphere testSphere{ {0.f,0.f,100.f}, 50.f, 0 };
+
+			GeometryUtils::HitTest_Sphere(testSphere, viewRay, closestHit);
+
+			if (closestHit.didHit)
+			{
+				finalColor = materials[closestHit.materialIndex]->Shade();
+			}
 
 			//Update Color in Buffer
 			finalColor.MaxToOne();
