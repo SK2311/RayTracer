@@ -15,31 +15,27 @@ namespace dae
 			//todo W1
 			//assert(false && "No Implemented Yet!");
 
-			//vector from ray origin to sphere origin
-			Vector3 tc{ sphere.origin - ray.origin };
+			float a{ Vector3::Dot(ray.direction, ray.direction) };
+			float b{ (Vector3::Dot(2 * ray.direction, (ray.origin - sphere.origin))) };
+			float c{ Vector3::Dot((ray.origin - sphere.origin), (ray.origin - sphere.origin)) - Square(sphere.radius) };
+			Vector3 p{};
 
-			//project the sphere origin on the ray
-			Vector3 p{ Vector3::Project(sphere.origin, ray.direction) };
+			float discriminant{ Square(b) - (4 * a * c) };
 
-			//get the length of the sides of the formed triangle
-			float tcLength{ tc.Magnitude() };
-			float dp{ Vector3::Dot(tc, ray.direction) };
-			float od{ Square(tcLength) - Square(dp) };
-
-			//distance between intersect point and projected point
-			float tca{ sqrt(Square(sphere.radius) - od) };
-
-			//distance between ray origin and intersect point
-			float t0{ dp - tca };
-
-			//calculate intersect point
-			Vector3 l1{ ray.origin + (t0 * ray.direction) };
-
-			if (true)
+			if (discriminant > 0.f)
 			{
-				hitRecord.t = t0;
-				hitRecord.didHit = true;
-			}
+				float t0{ (-b + sqrt(discriminant)) / (2 * a) };
+				float t1{ (-b - sqrt(discriminant)) / (2 * a) };
+				float t{ (t0 < t1) ? t0 : t1 };
+
+				if (t > ray.min && t < ray.max)
+				{
+					hitRecord.didHit = true;
+					hitRecord.t = t;
+					hitRecord.materialIndex = sphere.materialIndex;
+					return true;
+				}
+			}			
 
 			return false;
 		}

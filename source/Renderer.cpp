@@ -50,9 +50,7 @@ void Renderer::Render(Scene* pScene) const
 
 			HitRecord closestHit{};
 
-			Sphere testSphere{ {0.f,0.f,100.f}, 50.f, 0 };
-
-			GeometryUtils::HitTest_Sphere(testSphere, viewRay, closestHit);
+			pScene->GetClosestHit(viewRay, closestHit);
 
 			if (closestHit.didHit)
 			{
