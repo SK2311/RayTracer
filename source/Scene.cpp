@@ -42,6 +42,18 @@ namespace dae {
 				closestHit.materialIndex = tempHitRecord.materialIndex;
 			}
 		}
+
+		for (const Plane& plane : m_PlaneGeometries)
+		{
+			HitRecord tempHitRecord{};
+			GeometryUtils::HitTest_Plane(plane, ray, tempHitRecord);
+			if (tempHitRecord.t < closestHit.t)
+			{
+				closestHit.t = tempHitRecord.t;
+				closestHit.didHit = tempHitRecord.didHit;
+				closestHit.materialIndex = tempHitRecord.materialIndex;
+			}
+		}
 	}
 
 	bool Scene::DoesHit(const Ray& ray) const
