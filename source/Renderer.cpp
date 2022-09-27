@@ -30,13 +30,14 @@ void Renderer::Render(Scene* pScene) const
 	float screenWidth{ static_cast<float>(m_Width) };
 	float screenHeight{ static_cast<float>(m_Height) };
 	float aspectRatio{ screenWidth / screenHeight };
+	float fov{ std::tan((camera.fovAngle * TO_RADIANS) / 2) };
 
 	for (int px{}; px < m_Width; ++px)
 	{
 		for (int py{}; py < m_Height; ++py)
 		{
-			float cx= ((2 * (px + 0.5f) / screenWidth) - 1) * aspectRatio;
-			float cy= 1 - (2 * (py + 0.5f) / screenHeight);
+			float cx = (((2 * (px + 0.5f) / screenWidth) - 1) * aspectRatio) * fov;
+			float cy = (1 - (2 * (py + 0.5f) / screenHeight)) * fov;
 
 			Vector3 rayDirection{ cx,cy,camera.forward.z };
 			rayDirection.Normalize();
@@ -44,7 +45,7 @@ void Renderer::Render(Scene* pScene) const
 			/*Ray hitRay{ {0,0,0},rayDirection };
 			ColorRGB finalColor{ rayDirection.x,rayDirection.y, rayDirection.z };*/
 
-			Ray viewRay{ {0,0,0}, rayDirection };
+			Ray viewRay{ camera.origin, rayDirection };
 
 			ColorRGB finalColor{};
 
