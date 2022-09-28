@@ -40,10 +40,11 @@ void Renderer::Render(Scene* pScene) const
 			float cy = (1 - (2 * (py + 0.5f) / screenHeight)) * fov;
 
 			Vector3 rayDirection{ cx,cy,camera.forward.z };
-			rayDirection.Normalize();
 
-			/*Ray hitRay{ {0,0,0},rayDirection };
-			ColorRGB finalColor{ rayDirection.x,rayDirection.y, rayDirection.z };*/
+			const Matrix cameraToWorld = camera.CalculateCameraToWorld();
+			rayDirection = cameraToWorld.TransformVector(rayDirection);
+
+			rayDirection.Normalize();
 
 			Ray viewRay{ camera.origin, rayDirection };
 
