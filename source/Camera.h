@@ -22,7 +22,7 @@ namespace dae
 		Vector3 origin{};
 		float fovAngle{90.f};
 
-		Vector3 forward{ 0.266f,-0.453f,0.860f };
+		Vector3 forward{ Vector3::UnitZ };
 		Vector3 up{Vector3::UnitY};
 		Vector3 right{Vector3::UnitX};
 
@@ -31,19 +31,22 @@ namespace dae
 
 		Matrix cameraToWorld{};
 
+		float movementSpeed{1.f};
+		float rotationSpeed{};
+
 
 		Matrix CalculateCameraToWorld()
 		{
 			//todo: W2
 			//assert(false && "Not Implemented Yet");
 
-			right = Vector3::Cross(Vector3::UnitY, forward);
-			right.Normalize();
+			Vector3 newRight = Vector3::Cross(Vector3::UnitY, forward);
+			newRight.Normalize();
 
-			up = Vector3::Cross(forward, right);
-			up.Normalize();
+			Vector3 newUp = Vector3::Cross(forward, newRight);
+			newUp.Normalize();
 
-			cameraToWorld = { right, up, forward, origin };
+			cameraToWorld = { newRight, newUp, forward, origin };
 			return cameraToWorld;
 		}
 
@@ -54,6 +57,17 @@ namespace dae
 			//Keyboard Input
 			const uint8_t* pKeyboardState = SDL_GetKeyboardState(nullptr);
 
+			if (pKeyboardState[SDL_SCANCODE_W])
+				origin.z += (movementSpeed * deltaTime);
+
+			if (pKeyboardState[SDL_SCANCODE_A])
+				origin.x += (-movementSpeed * deltaTime);
+
+			if (pKeyboardState[SDL_SCANCODE_S])
+				origin.z += (-movementSpeed * deltaTime);
+
+			if (pKeyboardState[SDL_SCANCODE_D])
+				origin.x += (movementSpeed * deltaTime);
 
 			//Mouse Input
 			int mouseX{}, mouseY{};
