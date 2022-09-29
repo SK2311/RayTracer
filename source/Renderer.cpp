@@ -39,7 +39,7 @@ void Renderer::Render(Scene* pScene) const
 			float cx = (((2 * (px + 0.5f) / screenWidth) - 1) * aspectRatio) * fov;
 			float cy = (1 - (2 * (py + 0.5f) / screenHeight)) * fov;
 
-			Vector3 rayDirection{ cx,cy,camera.forward.z };
+			Vector3 rayDirection{ cx,cy,1 };
 
 			const Matrix cameraToWorld = camera.CalculateCameraToWorld();
 			rayDirection = cameraToWorld.TransformVector(rayDirection);

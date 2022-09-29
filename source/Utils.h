@@ -24,8 +24,11 @@ namespace dae
 
 			if (discriminant > 0.f)
 			{
-				float t0{ (-b + sqrt(discriminant)) / (2 * a) };
-				float t1{ (-b - sqrt(discriminant)) / (2 * a) };
+				float sqrtCalculation{ sqrt(discriminant) };
+				float divider{ (2 * a) };
+
+				float t0{ (-b + sqrtCalculation) / divider };
+				float t1{ (-b - sqrtCalculation) / divider };
 				float t{ (t0 < t1) ? t0 : t1 };
 
 				if (t > ray.min && t < ray.max)
