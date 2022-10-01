@@ -30,7 +30,10 @@ void Renderer::Render(Scene* pScene) const
 	float screenWidth{ static_cast<float>(m_Width) };
 	float screenHeight{ static_cast<float>(m_Height) };
 	float aspectRatio{ screenWidth / screenHeight };
-	float fov{ std::tan((camera.fovAngle * TO_RADIANS) / 2) };
+	float fov{ std::tanf((camera.fovAngle * TO_RADIANS) / 2.f) };
+	camera.CalculateCameraToWorld();
+
+	bool isInShadow{ false };
 
 	for (int px{}; px < m_Width; ++px)
 	{
@@ -39,10 +42,8 @@ void Renderer::Render(Scene* pScene) const
 			float cx = (((2 * (px + 0.5f) / screenWidth) - 1) * aspectRatio) * fov;
 			float cy = (1 - (2 * (py + 0.5f) / screenHeight)) * fov;
 
-			Vector3 rayDirection{ cx,cy,1 };
-
-			const Matrix cameraToWorld = camera.CalculateCameraToWorld();
-			rayDirection = cameraToWorld.TransformVector(rayDirection);
+			Vector3 rayDirection{ cx,cy,1 };			
+			rayDirection = camera.cameraToWorld.TransformVector(rayDirection);
 
 			rayDirection.Normalize();
 
@@ -56,7 +57,65 @@ void Renderer::Render(Scene* pScene) const
 
 			if (closestHit.didHit)
 			{
-				finalColor = materials[closestHit.materialIndex]->Shade();
+				Vector3 distanceToLightVector{};
+				float distanceToLight{};
+				for (auto& light : pScene->GetLights())
+				{
+					distanceToLightVector = light.origin - closestHit.origin;
+					distanceToLight = distanceToLightVector.Normalize();
+					
+					for (const dae::Sphere& sphere : pScene->GetSphereGeometries())
+					{
+						Vector3 normal = sphere.origin - closestHit.origin;
+						normal.Normalize();
+						//move closestHit.origin along the normal by 0.1f and put into movedHit
+						//to avoid self-shadowing
+						Vector3 movedHit = closestHit.origin + (normal * 0.1f);
+						Ray lightRay = { movedHit, distanceToLightVector, 0.001f, distanceToLight };
+						if (pScene->DoesHit(lightRay))
+						{
+							//occluder between light and sphere
+							if (lightRay.max < distanceToLight)
+							{
+								//shadow
+								isInShadow = false;
+								
+							}
+							else if (lightRay.max > distanceToLight || lightRay.max == distanceToLight)
+							{
+								//lit
+								isInShadow = true;
+							}
+						}
+					}
+
+					for (auto& plane : pScene->GetPlaneGeometries())
+					{
+						Vector3 normal = plane.origin - closestHit.origin;
+						normal.Normalize();
+						//move closestHit.origin along the normal by 0.1f and put into movedHit
+						//to avoid self-shadowing
+						Vector3 movedHit{};
+						Ray lightRay = { movedHit, distanceToLightVector, 0.001f, distanceToLight };
+						if (pScene->DoesHit(lightRay))
+						{
+							//occluder between light and plane
+							if (lightRay.max < distanceToLight)
+							{
+								//shadow
+							}
+							else if (lightRay.max > distanceToLight || lightRay.max == distanceToLight)
+							{
+								//lit
+							}
+						}
+					}
+
+				}
+				if (isInShadow)
+					finalColor = materials[closestHit.materialIndex]->Shade();
+				else
+					finalColor = (materials[closestHit.materialIndex]->Shade()) * 0.5f;
 			}
 
 			//Update Color in Buffer

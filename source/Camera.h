@@ -2,6 +2,7 @@
 #include <cassert>
 #include <SDL_keyboard.h>
 #include <SDL_mouse.h>
+#include <iostream>
 
 #include "Math.h"
 #include "Timer.h"
@@ -12,27 +13,27 @@ namespace dae
 	{
 		Camera() = default;
 
-		Camera(const Vector3& _origin, float _fovAngle):
-			origin{_origin},
-			fovAngle{_fovAngle}
+		Camera(const Vector3& _origin, float _fovAngle) :
+			origin{ _origin },
+			fovAngle{ _fovAngle }
 		{
 		}
 
 
 		Vector3 origin{};
-		float fovAngle{90.f};
+		float fovAngle{ 90.f };
 
 		Vector3 forward{ Vector3::UnitZ };
-		Vector3 up{Vector3::UnitY};
-		Vector3 right{Vector3::UnitX};
+		Vector3 up{ Vector3::UnitY };
+		Vector3 right{ Vector3::UnitX };
 
-		float totalPitch{0.f};
-		float totalYaw{0.f};
+		float totalPitch{ 0.f };
+		float totalYaw{ 0.f };
 
 		Matrix cameraToWorld{};
 
-		float movementSpeed{1.f};
-		float rotationSpeed{};
+		float movementSpeed{ 1.f };
+		float rotationSpeed{ 5.f };
 
 
 		Matrix CalculateCameraToWorld()
@@ -40,13 +41,12 @@ namespace dae
 			//todo: W2
 			//assert(false && "Not Implemented Yet");
 
-			Vector3 newRight = Vector3::Cross(Vector3::UnitY, forward);
-			newRight.Normalize();
+			Matrix rotation = Matrix::CreateRotationX(totalPitch * TO_RADIANS) * Matrix::CreateRotationY(totalYaw * TO_RADIANS);
+			forward = rotation.GetAxisZ();
+			right = rotation.GetAxisX();
+			up = rotation.GetAxisY();
 
-			Vector3 newUp = Vector3::Cross(forward, newRight);
-			newUp.Normalize();
-
-			cameraToWorld = { newRight, newUp, forward, origin };
+			cameraToWorld = { right, up, forward, origin };
 			return cameraToWorld;
 		}
 
@@ -56,22 +56,40 @@ namespace dae
 
 			//Keyboard Input
 			const uint8_t* pKeyboardState = SDL_GetKeyboardState(nullptr);
-
 			if (pKeyboardState[SDL_SCANCODE_W])
-				origin.z += (movementSpeed * deltaTime);
+				origin += forward * movementSpeed * deltaTime;
 
 			if (pKeyboardState[SDL_SCANCODE_A])
-				origin.x += (-movementSpeed * deltaTime);
+				origin += right  *  (- movementSpeed) * deltaTime;
 
 			if (pKeyboardState[SDL_SCANCODE_S])
-				origin.z += (-movementSpeed * deltaTime);
+				origin += -forward * movementSpeed * deltaTime;
 
 			if (pKeyboardState[SDL_SCANCODE_D])
-				origin.x += (movementSpeed * deltaTime);
+				origin += right * movementSpeed * deltaTime;
+
+			if (pKeyboardState[SDL_SCANCODE_LEFT])
+				fovAngle += 5.f;
 
 			//Mouse Input
 			int mouseX{}, mouseY{};
 			const uint32_t mouseState = SDL_GetRelativeMouseState(&mouseX, &mouseY);
+			if (mouseState & SDL_BUTTON(SDL_BUTTON_LEFT) && mouseState & SDL_BUTTON(SDL_BUTTON_RIGHT))
+			{
+				std::cout << "left and right mouse button\n";
+			}
+			else if (mouseState & SDL_BUTTON(SDL_BUTTON_LEFT))
+			{
+				std::cout << "left mouse button\n";
+			}
+			else if (mouseState & SDL_BUTTON(SDL_BUTTON_RIGHT))
+			{
+				const float pitch = -mouseY;
+				const float yaw = mouseX;
+
+				totalPitch += pitch;
+				totalYaw += yaw;
+			}
 
 			//todo: W2
 			//assert(false && "Not Implemented Yet");

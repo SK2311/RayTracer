@@ -124,7 +124,7 @@ namespace dae {
 	{
 		//todo W1
 		//assert(false && "Not Implemented Yet");
-		Vector3 vector1 = { 0.f,0.f,0.f };
+		Vector3 vector1 = { 1.f,0.f,0.f };
 		Vector3 vector2 = { 0.f, cosf(pitch), -sinf(pitch) };
 		Vector3 vector3 = { 0.f, sinf(pitch), cosf(pitch) };
 		Vector3 vector4 = { 0.f,0.f,0.f };
@@ -138,7 +138,7 @@ namespace dae {
 		//todo W1
 		//assert(false && "Not Implemented Yet");
 		Vector3 vector1 = { cosf(yaw), 0, -sinf(yaw) };
-		Vector3 vector2 = { 0.f,0.f,0.f };
+		Vector3 vector2 = { 0.f,1.f,0.f };
 		Vector3 vector3 = { sinf(yaw), 0.f, cosf(yaw) };
 		Vector3 vector4 = { 0.f,0.f,0.f };
 
@@ -152,7 +152,7 @@ namespace dae {
 		//assert(false && "Not Implemented Yet");
 		Vector3 vector1 = { cosf(roll), sinf(roll), 0.f };
 		Vector3 vector2 = { -sinf(roll), cos(roll), 0.f };
-		Vector3 vector3 = { 0.f, 0.f, 0.f };
+		Vector3 vector3 = { 0.f, 0.f, 1.f };
 		Vector3 vector4 = { 0.f, 0.f, 0.f };
 
 		Matrix zRotation = { vector1, vector2, vector3, vector4 };
@@ -162,12 +162,13 @@ namespace dae {
 	Matrix Matrix::CreateRotation(const Vector3& r)
 	{
 		//todo W1
-		assert(false && "Not Implemented Yet");
+		//assert(false && "Not Implemented Yet");
 		Matrix pitch = CreateRotationX(r.x);
-		Matrix yaw = CreateRotationX(r.y);
-		Matrix roll = CreateRotationX(r.z);
+		Matrix yaw = CreateRotationY(r.y);
+		Matrix roll = CreateRotationZ(r.z);
 
-		return {};
+		Matrix rotation = pitch * yaw * roll;
+		return rotation;
 	}
 
 	Matrix Matrix::CreateRotation(float pitch, float yaw, float roll)
