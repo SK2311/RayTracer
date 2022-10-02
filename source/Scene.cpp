@@ -40,6 +40,8 @@ namespace dae {
 				closestHit.t = tempHitRecord.t;
 				closestHit.didHit = tempHitRecord.didHit;
 				closestHit.materialIndex = tempHitRecord.materialIndex;
+				closestHit.normal = tempHitRecord.normal;
+				closestHit.origin = tempHitRecord.origin;
 			}
 		}
 
@@ -52,6 +54,8 @@ namespace dae {
 				closestHit.t = tempHitRecord.t;
 				closestHit.didHit = tempHitRecord.didHit;
 				closestHit.materialIndex = tempHitRecord.materialIndex;
+				closestHit.normal = tempHitRecord.normal;
+				closestHit.origin = tempHitRecord.origin;
 			}
 		}
 	}
