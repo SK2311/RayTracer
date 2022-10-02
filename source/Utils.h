@@ -12,13 +12,9 @@ namespace dae
 		//SPHERE HIT-TESTS
 		inline bool HitTest_Sphere(const Sphere& sphere, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false)
 		{
-			//todo W1
-			//assert(false && "No Implemented Yet!");
-
 			float a{ Vector3::Dot(ray.direction, ray.direction) };
 			float b{ (Vector3::Dot(2 * ray.direction, (ray.origin - sphere.origin))) };
 			float c{ Vector3::Dot((ray.origin - sphere.origin), (ray.origin - sphere.origin)) - Square(sphere.radius) };
-			Vector3 p{};
 
 			float discriminant{ Square(b) - (4 * a * c) };
 
@@ -27,15 +23,18 @@ namespace dae
 				float sqrtCalculation{ sqrt(discriminant) };
 				float divider{ (2 * a) };
 
-				float t0{ (-b + sqrtCalculation) / divider };
-				float t1{ (-b - sqrtCalculation) / divider };
+				float t0{ (-b - sqrtCalculation) / divider };
+				float t1{ (-b + sqrtCalculation) / divider };
 				float t{ (t0 < t1) ? t0 : t1 };
 
 				if (t > ray.min && t < ray.max)
 				{
+					const Vector3 pointI1{ ray.origin + ray.direction * t };
 					hitRecord.didHit = true;
 					hitRecord.t = t;
 					hitRecord.materialIndex = sphere.materialIndex;
+					hitRecord.origin = pointI1;
+					hitRecord.normal = (pointI1 - sphere.origin).Normalized();
 					return true;
 				}
 			}			
@@ -53,19 +52,17 @@ namespace dae
 		//PLANE HIT-TESTS
 		inline bool HitTest_Plane(const Plane& plane, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false)
 		{
-			//todo W1
-			//assert(false && "No Implemented Yet!");
-
 			float t{ Vector3::Dot((plane.origin - ray.origin), plane.normal) };
 			t /= Vector3::Dot(ray.direction, plane.normal);
 
-			Vector3 p{ ray.origin + (t * ray.direction) };
-
 			if (t > ray.min && t < ray.max)
 			{
+				const Vector3 pointI1{ ray.origin + ray.direction * t };
 				hitRecord.didHit = true;
 				hitRecord.t = t;
 				hitRecord.materialIndex = plane.materialIndex;
+				hitRecord.origin = pointI1;
+				hitRecord.normal = plane.normal;
 				return true;
 			}
 
@@ -115,8 +112,9 @@ namespace dae
 		inline Vector3 GetDirectionToLight(const Light& light, const Vector3 origin)
 		{
 			//todo W3
-			assert(false && "No Implemented Yet!");
-			return {};
+			Vector3 direction{};
+			direction = light.origin - origin;
+			return direction;
 		}
 
 		inline ColorRGB GetRadiance(const Light& light, const Vector3& target)

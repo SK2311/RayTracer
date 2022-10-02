@@ -57,65 +57,19 @@ void Renderer::Render(Scene* pScene) const
 
 			if (closestHit.didHit)
 			{
-				Vector3 distanceToLightVector{};
-				float distanceToLight{};
-				for (auto& light : pScene->GetLights())
+				finalColor = materials[closestHit.materialIndex]->Shade();
+
+				for (int i{ 0 }; i < lights.size(); ++i)
 				{
-					distanceToLightVector = light.origin - closestHit.origin;
-					distanceToLight = distanceToLightVector.Normalize();
-					
-					for (const dae::Sphere& sphere : pScene->GetSphereGeometries())
+					Vector3 directionToLight = LightUtils::GetDirectionToLight(lights[i], closestHit.origin);
+					const float directionMagnitude = directionToLight.Normalize();
+					Ray ray{ closestHit.origin + (closestHit.normal * 0.001f), directionToLight };
+					ray.max = directionMagnitude;
+					if (pScene->DoesHit(ray))
 					{
-						Vector3 normal = sphere.origin - closestHit.origin;
-						normal.Normalize();
-						//move closestHit.origin along the normal by 0.1f and put into movedHit
-						//to avoid self-shadowing
-						Vector3 movedHit = closestHit.origin + (normal * 0.1f);
-						Ray lightRay = { movedHit, distanceToLightVector, 0.001f, distanceToLight };
-						if (pScene->DoesHit(lightRay))
-						{
-							//occluder between light and sphere
-							if (lightRay.max < distanceToLight)
-							{
-								//shadow
-								isInShadow = false;
-								
-							}
-							else if (lightRay.max > distanceToLight || lightRay.max == distanceToLight)
-							{
-								//lit
-								isInShadow = true;
-							}
-						}
+						finalColor *= 0.5f;
 					}
-
-					for (auto& plane : pScene->GetPlaneGeometries())
-					{
-						Vector3 normal = plane.origin - closestHit.origin;
-						normal.Normalize();
-						//move closestHit.origin along the normal by 0.1f and put into movedHit
-						//to avoid self-shadowing
-						Vector3 movedHit{};
-						Ray lightRay = { movedHit, distanceToLightVector, 0.001f, distanceToLight };
-						if (pScene->DoesHit(lightRay))
-						{
-							//occluder between light and plane
-							if (lightRay.max < distanceToLight)
-							{
-								//shadow
-							}
-							else if (lightRay.max > distanceToLight || lightRay.max == distanceToLight)
-							{
-								//lit
-							}
-						}
-					}
-
 				}
-				if (isInShadow)
-					finalColor = materials[closestHit.materialIndex]->Shade();
-				else
-					finalColor = (materials[closestHit.materialIndex]->Shade()) * 0.5f;
 			}
 
 			//Update Color in Buffer

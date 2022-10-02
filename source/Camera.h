@@ -32,8 +32,7 @@ namespace dae
 
 		Matrix cameraToWorld{};
 
-		float movementSpeed{ 1.f };
-		float rotationSpeed{ 5.f };
+		float movementSpeed{ 5.f };
 
 
 		Matrix CalculateCameraToWorld()
@@ -41,6 +40,8 @@ namespace dae
 			//todo: W2
 			//assert(false && "Not Implemented Yet");
 
+			//create rotation matrix to calculate forward/right/up vector
+			//create and return OBN matrix
 			Matrix rotation = Matrix::CreateRotationX(totalPitch * TO_RADIANS) * Matrix::CreateRotationY(totalYaw * TO_RADIANS);
 			forward = rotation.GetAxisZ();
 			right = rotation.GetAxisX();
@@ -84,8 +85,8 @@ namespace dae
 			}
 			else if (mouseState & SDL_BUTTON(SDL_BUTTON_RIGHT))
 			{
-				const float pitch = -mouseY;
-				const float yaw = mouseX;
+				const float pitch = (float) - mouseY;
+				const float yaw = (float) mouseX;
 
 				totalPitch += pitch;
 				totalYaw += yaw;
