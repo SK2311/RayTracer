@@ -19,7 +19,6 @@ namespace dae
 		{
 		}
 
-
 		Vector3 origin{};
 		float fovAngle{ 90.f };
 
@@ -33,7 +32,6 @@ namespace dae
 		Matrix cameraToWorld{};
 
 		float movementSpeed{ 5.f };
-
 
 		Matrix CalculateCameraToWorld()
 		{
@@ -77,7 +75,7 @@ namespace dae
 			const uint32_t mouseState = SDL_GetRelativeMouseState(&mouseX, &mouseY);
 			if (mouseState & SDL_BUTTON(SDL_BUTTON_LEFT) && mouseState & SDL_BUTTON(SDL_BUTTON_RIGHT))
 			{
-				std::cout << "left and right mouse button\n";
+				origin += up * (float)-mouseY * deltaTime;
 			}
 			else if (mouseState & SDL_BUTTON(SDL_BUTTON_LEFT))
 			{
