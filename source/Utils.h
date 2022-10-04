@@ -119,8 +119,10 @@ namespace dae
 		inline ColorRGB GetRadiance(const Light& light, const Vector3& target)
 		{
 			//todo W3
-			assert(false && "No Implemented Yet!");
-			return {};
+			//assert(false && "No Implemented Yet!");
+			float rSquared = (light.origin-target).SqrMagnitude();
+			auto E_RGB = light.color * (light.intensity / rSquared);
+			return E_RGB;
 		}
 	}
 

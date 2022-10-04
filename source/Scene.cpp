@@ -231,8 +231,29 @@ namespace dae {
 		AddSphere(Vector3{ 1.75f, 3.f, 0.f }, 0.75f, matCT_GraySmoothPlastic);
 
 		//Light
-		AddPointLight(Vector3{ 0.f, 5.f, 5.f }, 50.f, ColorRGB{ 1.f, 0.61f, 0.45f }); //Backlight
-		AddPointLight(Vector3{ -2.5f, 5.f, -5.f }, 70.f, ColorRGB{ 1.f, 0.8f, 0.45f }); //Front light left
-		AddPointLight(Vector3{ 2.5f, 2.5f, -5.f }, 50.f, ColorRGB{ 0.34f, 0.47f, 0.68f }); //Front light right
+		//AddPointLight(Vector3{ 0.f, 5.f, 5.f }, 50.f, ColorRGB{ 1.f, 0.61f, 0.45f }); //Backlight
+		//AddPointLight(Vector3{ -2.5f, 5.f, -5.f }, 70.f, ColorRGB{ 1.f, 0.8f, 0.45f }); //Front light left
+		//AddPointLight(Vector3{ 2.5f, 2.5f, -5.f }, 50.f, ColorRGB{ 0.34f, 0.47f, 0.68f }); //Front light right
+		AddPointLight(Vector3{ 0.f, 5.f, 5.f }, 50.f, colors::White); //Backlight
+		AddPointLight(Vector3{ -2.5f, 5.f, -5.f }, 70.f, colors::White); //Front light left
+		AddPointLight(Vector3{ 2.5f, 2.5f, -5.f }, 50.f, colors::White); //Front light right
+	}
+
+	void Scene_W3_TestScene::Initialize()
+	{
+		m_Camera.origin = { 0.f,1.f,-5.f };
+		m_Camera.fovAngle = 45.f;
+
+		constexpr unsigned char matId_Solid_Red = 0;
+		const unsigned char matId_Solid_Blue = AddMaterial(new Material_SolidColor(colors::Blue));
+		const unsigned char matId_Solid_Yellow = AddMaterial(new Material_SolidColor(colors::Yellow));
+
+		AddSphere({ -0.75f, 1.0f, 0.0f }, 1.0f, matId_Solid_Red);
+		AddSphere({ 0.75f, 1.0f, 0.0f }, 1.0f, matId_Solid_Blue);
+
+		AddPlane({ 0.0f, 0.0f,0.0f }, { 0.0f, 1.0f, 0.0f }, matId_Solid_Yellow);
+
+		AddPointLight({ 0.0f, 5.0f, 5.0f }, 25.0f, colors::White);
+		AddPointLight({ 0.0f, 2.5f, -5.0f }, 25.0f, colors::White);
 	}
 }
