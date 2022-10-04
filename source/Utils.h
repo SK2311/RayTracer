@@ -14,9 +14,9 @@ namespace dae
 		{
 			float a{ Vector3::Dot(ray.direction, ray.direction) };
 			float b{ (Vector3::Dot(2 * ray.direction, (ray.origin - sphere.origin))) };
-			float c{ Vector3::Dot((ray.origin - sphere.origin), (ray.origin - sphere.origin)) - Square(sphere.radius) };
+			float c{ Vector3::Dot((ray.origin - sphere.origin), (ray.origin - sphere.origin)) - (sphere.radius * sphere.radius) };
 
-			float discriminant{ Square(b) - (4 * a * c) };
+			float discriminant{ (b*b) - (4 * a * c) };
 
 			if (discriminant > 0.f)
 			{
@@ -54,7 +54,6 @@ namespace dae
 		{
 			float t{ Vector3::Dot((plane.origin - ray.origin), plane.normal) };
 			t /= Vector3::Dot(ray.direction, plane.normal);
-
 			if (t > ray.min && t < ray.max)
 			{
 				const Vector3 pointI1{ ray.origin + ray.direction * t };

@@ -14,14 +14,14 @@ namespace dae
 		static ColorRGB Lambert(float kd, const ColorRGB& cd)
 		{
 			//todo: W3
-			assert(false && "Not Implemented Yet");
+			//assert(false && "Not Implemented Yet");
 			return {};
 		}
 
 		static ColorRGB Lambert(const ColorRGB& kd, const ColorRGB& cd)
 		{
 			//todo: W3
-			assert(false && "Not Implemented Yet");
+			//assert(false && "Not Implemented Yet");
 			return {};
 		}
 
@@ -37,7 +37,7 @@ namespace dae
 		static ColorRGB Phong(float ks, float exp, const Vector3& l, const Vector3& v, const Vector3& n)
 		{
 			//todo: W3
-			assert(false && "Not Implemented Yet");
+			//assert(false && "Not Implemented Yet");
 			return {};
 		}
 
@@ -51,7 +51,7 @@ namespace dae
 		static ColorRGB FresnelFunction_Schlick(const Vector3& h, const Vector3& v, const ColorRGB& f0)
 		{
 			//todo: W3
-			assert(false && "Not Implemented Yet");
+			//assert(false && "Not Implemented Yet");
 			return {};
 		}
 
@@ -65,7 +65,7 @@ namespace dae
 		static float NormalDistribution_GGX(const Vector3& n, const Vector3& h, float roughness)
 		{
 			//todo: W3
-			assert(false && "Not Implemented Yet");
+			//assert(false && "Not Implemented Yet");
 			return {};
 		}
 
@@ -80,7 +80,7 @@ namespace dae
 		static float GeometryFunction_SchlickGGX(const Vector3& n, const Vector3& v, float roughness)
 		{
 			//todo: W3
-			assert(false && "Not Implemented Yet");
+			//assert(false && "Not Implemented Yet");
 			return {};
 		}
 
@@ -95,7 +95,7 @@ namespace dae
 		static float GeometryFunction_Smith(const Vector3& n, const Vector3& v, const Vector3& l, float roughness)
 		{
 			//todo: W3
-			assert(false && "Not Implemented Yet");
+			//assert(false && "Not Implemented Yet");
 			return {};
 		}
 

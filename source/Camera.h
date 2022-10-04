@@ -79,7 +79,10 @@ namespace dae
 			}
 			else if (mouseState & SDL_BUTTON(SDL_BUTTON_LEFT))
 			{
-				std::cout << "left mouse button\n";
+				const float yaw = (float)mouseX;
+				totalYaw += yaw;
+
+				origin += forward * (float) - mouseY * movementSpeed * deltaTime;
 			}
 			else if (mouseState & SDL_BUTTON(SDL_BUTTON_RIGHT))
 			{
