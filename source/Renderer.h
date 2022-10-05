@@ -44,6 +44,6 @@ namespace dae
 			BRDF, //Scattering of light
 			Combined //ObservedArea*Radiance*BRDF
 		};
-		LightingMode m_CurrentLightingMode{ LightingMode::Combined };
+		LightingMode m_CurrentLightingMode{ LightingMode::BRDF };
 	};
 }

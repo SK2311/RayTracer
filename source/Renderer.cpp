@@ -59,16 +59,50 @@ void Renderer::Render(Scene* pScene) const
 			{
 				for (int i{ 0 }; i < lights.size(); ++i)
 				{
-					float dot = Vector3::Dot(closestHit.normal, LightUtils::GetDirectionToLight(lights[i], closestHit.origin).Normalized());
-					if(dot >= 0)
-						finalColor += LightUtils::GetRadiance(lights[i], closestHit.origin) * dot;
-				}
+					Vector3 directionToLightFunction{ LightUtils::GetDirectionToLight(lights[i], closestHit.origin) };
 
-				if (m_ShadowsEnabled)
-				{
-					for (int i{ 0 }; i < lights.size(); ++i)
+					switch (m_CurrentLightingMode)
 					{
-						Vector3 directionToLight = LightUtils::GetDirectionToLight(lights[i], closestHit.origin);
+					case dae::Renderer::LightingMode::ObservedArea:
+					{
+						float dot = Vector3::Dot(closestHit.normal, directionToLightFunction.Normalized());
+						if (dot < 0)
+							continue;
+
+						finalColor += ColorRGB{ dot, dot, dot };
+						break;
+					}
+					case dae::Renderer::LightingMode::Radiance:
+					{
+						auto lightRadiance{ LightUtils::GetRadiance(lights[i], closestHit.origin) };
+
+						finalColor += lightRadiance;
+						break;
+					}
+					case dae::Renderer::LightingMode::BRDF:
+					{
+						ColorRGB BRDFColour{ materials[closestHit.materialIndex]->Shade(closestHit, directionToLightFunction.Normalized(), rayDirection) };
+
+						finalColor += BRDFColour;
+						break;
+					}
+					case dae::Renderer::LightingMode::Combined:
+					{
+						float dot = Vector3::Dot(closestHit.normal, directionToLightFunction.Normalized());
+						if (dot < 0)
+							continue;
+
+						ColorRGB BRDFColour{ materials[closestHit.materialIndex]->Shade(closestHit, directionToLightFunction.Normalized(), rayDirection)};
+						auto lightRadiance{ LightUtils::GetRadiance(lights[i], closestHit.origin) };
+
+						finalColor += lightRadiance * BRDFColour * ColorRGB{ dot, dot, dot };
+						break;
+					}
+					}
+
+					if (m_ShadowsEnabled)
+					{
+						Vector3 directionToLight = directionToLightFunction;
 						const float directionMagnitude = directionToLight.Normalize();
 						Ray ray{ closestHit.origin + (closestHit.normal * 0.001f), directionToLight };
 						ray.max = directionMagnitude;
@@ -106,15 +140,19 @@ void dae::Renderer::CycleLightingMode()
 	{
 	case dae::Renderer::LightingMode::ObservedArea:
 		m_CurrentLightingMode = LightingMode::Radiance;
+		std::cout << "Change to Radiance\n";
 		break;
 	case dae::Renderer::LightingMode::Radiance:
 		m_CurrentLightingMode = LightingMode::BRDF;
+		std::cout << "Change to BRDF\n";
 		break;
 	case dae::Renderer::LightingMode::BRDF:
 		m_CurrentLightingMode = LightingMode::Combined;
+		std::cout << "Change to Combined\n";
 		break;
 	case dae::Renderer::LightingMode::Combined:
 		m_CurrentLightingMode = LightingMode::ObservedArea;
+		std::cout << "Change to ObservedArea\n";
 		break;
 	default:
 		break;

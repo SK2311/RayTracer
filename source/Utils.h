@@ -120,9 +120,21 @@ namespace dae
 		{
 			//todo W3
 			//assert(false && "No Implemented Yet!");
-			float rSquared = (light.origin-target).SqrMagnitude();
-			auto E_RGB = light.color * (light.intensity / rSquared);
-			return E_RGB;
+			switch (light.type)
+			{
+			case LightType::Point:
+			{
+				const float intensity{ light.intensity };
+				const float sphereRadiusSquared{ (target - light.origin).SqrMagnitude() };
+				return light.color * (intensity / sphereRadiusSquared);
+				break;
+			}
+			case LightType::Directional:
+			{
+				return light.color * light.intensity;
+				break;
+			}
+			}
 		}
 	}
 

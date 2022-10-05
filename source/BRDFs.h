@@ -15,14 +15,16 @@ namespace dae
 		{
 			//todo: W3
 			//assert(false && "Not Implemented Yet");
-			return {};
+			auto rho{ cd * kd };
+			return rho / M_PI;
 		}
 
 		static ColorRGB Lambert(const ColorRGB& kd, const ColorRGB& cd)
 		{
 			//todo: W3
 			//assert(false && "Not Implemented Yet");
-			return {};
+			ColorRGB rho{ cd.r / kd.r, cd.g / kd.g, cd.b / kd.b };
+			return rho / M_PI;
 		}
 
 		/**
