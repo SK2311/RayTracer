@@ -81,7 +81,7 @@ void Renderer::Render(Scene* pScene) const
 					}
 					case dae::Renderer::LightingMode::BRDF:
 					{
-						ColorRGB BRDFColour{ materials[closestHit.materialIndex]->Shade(closestHit, directionToLightFunction.Normalized(), rayDirection) };
+						ColorRGB BRDFColour{ materials[closestHit.materialIndex]->Shade(closestHit, directionToLightFunction.Normalized(), rayDirection.Normalized()) };
 
 						finalColor += BRDFColour;
 						break;

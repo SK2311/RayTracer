@@ -86,7 +86,8 @@ namespace dae
 		{
 			//todo: W3
 			//assert(false && "Not Implemented Yet");
-			return {};
+			return BRDF::Lambert(m_DiffuseReflectance, m_DiffuseColor) + 
+				BRDF::Phong(m_SpecularReflectance, m_PhongExponent, l, v, hitRecord.normal);
 		}
 
 	private:
@@ -111,7 +112,27 @@ namespace dae
 		{
 			//todo: W3
 			//assert(false && "Not Implemented Yet");
-			return {};
+			ColorRGB f0{ (m_Metalness == 0) ? ColorRGB{ 0.04f, 0.04f, 0.04f } : m_Albedo };
+
+			const auto halfVector{ (v + l) / (v + l).Magnitude() };
+
+			const auto f{ BRDF::FresnelFunction_Schlick(halfVector, v, f0) };
+			const auto d{ BRDF::NormalDistribution_GGX(hitRecord.normal, halfVector, m_Roughness) };
+			const auto g{ BRDF::GeometryFunction_Smith(hitRecord.normal, v, l, m_Roughness) };
+
+			const auto dotVN{ Vector3::Dot(v, hitRecord.normal) };
+			const auto dotLN{ Vector3::Dot(l, hitRecord.normal) };
+			const auto dfg{ d * f * g };
+			const auto numerator{ (4 * dotVN * dotLN) };
+			ColorRGB specular{ dfg.r / numerator, dfg.g / numerator, dfg.b / numerator };
+
+			ColorRGB kd{ (m_Metalness == 0) ? ColorRGB{ 1 - f.r, 1 - f.g, 1 - f.b } : ColorRGB{ 0.f, 0.f, 0.f } };
+
+			const auto diffuse{ BRDF::Lambert(kd, m_Albedo) };
+
+			const ColorRGB finalColour{ diffuse + specular };
+
+			return finalColour;
 		}
 
 	private:

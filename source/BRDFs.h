@@ -23,7 +23,7 @@ namespace dae
 		{
 			//todo: W3
 			//assert(false && "Not Implemented Yet");
-			ColorRGB rho{ cd.r / kd.r, cd.g / kd.g, cd.b / kd.b };
+			ColorRGB rho{ cd * kd };
 			return rho / M_PI;
 		}
 
@@ -40,7 +40,11 @@ namespace dae
 		{
 			//todo: W3
 			//assert(false && "Not Implemented Yet");
-			return {};
+			const auto r{ l - 2 * (Vector3::Dot(n, l)) * n };
+			const auto cosAlpha{ std::max(Vector3::Dot(r, v), 0.f) };
+			const auto phong{ ks * (powf(cosAlpha, exp)) };
+			ColorRGB phongRGB{ phong, phong, phong };
+			return phongRGB;
 		}
 
 		/**
@@ -54,7 +58,9 @@ namespace dae
 		{
 			//todo: W3
 			//assert(false && "Not Implemented Yet");
-			return {};
+			const auto dot{ Vector3::Dot(h, v) };
+			const auto f{ f0 + (ColorRGB{1, 1, 1} - f0) * powf((1 - dot), 5) };
+			return f;
 		}
 
 		/**
@@ -68,7 +74,11 @@ namespace dae
 		{
 			//todo: W3
 			//assert(false && "Not Implemented Yet");
-			return {};
+			const auto alpha{ roughness * roughness };
+			const auto alphaSquared{ alpha * alpha };
+			const auto dot{ Vector3::Dot(n, h) };
+			const auto d{ alphaSquared / (M_PI * Square((Square(dot) * (alphaSquared - 1) + 1))) };
+			return d;
 		}
 
 
@@ -83,7 +93,11 @@ namespace dae
 		{
 			//todo: W3
 			//assert(false && "Not Implemented Yet");
-			return {};
+			const auto dot{ Vector3::Dot(n, v) };
+			const auto alpha{ roughness * roughness };	
+			const auto k{ Square(alpha + 1) / 8 };
+			const auto g{ dot / (dot * (1 - k) + k) };
+			return g;
 		}
 
 		/**
@@ -98,8 +112,7 @@ namespace dae
 		{
 			//todo: W3
 			//assert(false && "Not Implemented Yet");
-			return {};
+			return GeometryFunction_SchlickGGX(n, v, roughness) * GeometryFunction_SchlickGGX(n, l, roughness);
 		}
-
 	}
 }
