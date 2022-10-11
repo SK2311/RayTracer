@@ -112,16 +112,20 @@ namespace dae
 		{
 			//todo: W3
 			//assert(false && "Not Implemented Yet");
+
+			//look and view vector needs to be negative because
+
 			ColorRGB f0{ (m_Metalness == 0) ? ColorRGB{ 0.04f, 0.04f, 0.04f } : m_Albedo };
 
-			const auto halfVector{ (v + l) / (v + l).Magnitude() };
+			const auto halfVector{ (-v - l) / (-v - l).Magnitude() };
+			halfVector.Normalized();
 
-			const auto f{ BRDF::FresnelFunction_Schlick(halfVector, v, f0) };
+			const auto f{ BRDF::FresnelFunction_Schlick(halfVector, -v, f0) };
 			const auto d{ BRDF::NormalDistribution_GGX(hitRecord.normal, halfVector, m_Roughness) };
-			const auto g{ BRDF::GeometryFunction_Smith(hitRecord.normal, v, l, m_Roughness) };
+			const auto g{ BRDF::GeometryFunction_Smith(hitRecord.normal, -v, -l, m_Roughness) };
 
-			const auto dotVN{ Vector3::Dot(v, hitRecord.normal) };
-			const auto dotLN{ Vector3::Dot(l, hitRecord.normal) };
+			const auto dotVN{ Vector3::Dot(-v, hitRecord.normal) };
+			const auto dotLN{ Vector3::Dot(-l, hitRecord.normal) };
 			const auto dfg{ d * f * g };
 			const auto numerator{ (4 * dotVN * dotLN) };
 			ColorRGB specular{ dfg.r / numerator, dfg.g / numerator, dfg.b / numerator };

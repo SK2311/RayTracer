@@ -12,7 +12,7 @@
 
 using namespace dae;
 
-Renderer::Renderer(SDL_Window * pWindow) :
+Renderer::Renderer(SDL_Window* pWindow) :
 	m_pWindow(pWindow),
 	m_pBuffer(SDL_GetWindowSurface(pWindow))
 {
@@ -42,9 +42,8 @@ void Renderer::Render(Scene* pScene) const
 			float cx = (((2 * (px + 0.5f) / screenWidth) - 1) * aspectRatio) * fov;
 			float cy = (1 - (2 * (py + 0.5f) / screenHeight)) * fov;
 
-			Vector3 rayDirection{ cx,cy,1 };			
+			Vector3 rayDirection{ cx,cy,1 };
 			rayDirection = camera.cameraToWorld.TransformVector(rayDirection);
-
 			rayDirection.Normalize();
 
 			Ray viewRay{ camera.origin, rayDirection };
@@ -63,41 +62,40 @@ void Renderer::Render(Scene* pScene) const
 
 					switch (m_CurrentLightingMode)
 					{
-					case dae::Renderer::LightingMode::ObservedArea:
-					{
-						float dot = Vector3::Dot(closestHit.normal, directionToLightFunction.Normalized());
-						if (dot < 0)
-							continue;
+						case dae::Renderer::LightingMode::ObservedArea:
+						{
+							float observedArea = Vector3::Dot(closestHit.normal, directionToLightFunction.Normalized());
+							if (observedArea < 0)
+								continue;
 
-						finalColor += ColorRGB{ dot, dot, dot };
-						break;
-					}
-					case dae::Renderer::LightingMode::Radiance:
-					{
-						auto lightRadiance{ LightUtils::GetRadiance(lights[i], closestHit.origin) };
+							finalColor += ColorRGB{ observedArea, observedArea, observedArea };
+							break;
+						}
+						case dae::Renderer::LightingMode::Radiance:
+						{
+							auto lightRadiance{ LightUtils::GetRadiance(lights[i], closestHit.origin) };
 
-						finalColor += lightRadiance;
-						break;
-					}
-					case dae::Renderer::LightingMode::BRDF:
-					{
-						ColorRGB BRDFColour{ materials[closestHit.materialIndex]->Shade(closestHit, directionToLightFunction.Normalized(), rayDirection.Normalized()) };
+							finalColor += lightRadiance;
+							break;
+						}
+						case dae::Renderer::LightingMode::BRDF:
+						{
+							ColorRGB BRDFColour{ materials[closestHit.materialIndex]->Shade(closestHit, -directionToLightFunction.Normalized(), rayDirection) };
 
-						finalColor += BRDFColour;
-						break;
-					}
-					case dae::Renderer::LightingMode::Combined:
-					{
-						float dot = Vector3::Dot(closestHit.normal, directionToLightFunction.Normalized());
-						if (dot < 0)
-							continue;
+							finalColor += BRDFColour;
+							break;
+						}
+						case dae::Renderer::LightingMode::Combined:
+						{
+							float observedArea = Vector3::Dot(closestHit.normal, directionToLightFunction.Normalized());
+							if (observedArea < 0)
+								continue;
 
-						ColorRGB BRDFColour{ materials[closestHit.materialIndex]->Shade(closestHit, directionToLightFunction.Normalized(), rayDirection)};
-						auto lightRadiance{ LightUtils::GetRadiance(lights[i], closestHit.origin) };
-
-						finalColor += lightRadiance * BRDFColour * ColorRGB{ dot, dot, dot };
-						break;
-					}
+							ColorRGB BRDFColour{ materials[closestHit.materialIndex]->Shade(closestHit, -directionToLightFunction.Normalized(), rayDirection) };
+							auto lightRadiance{ LightUtils::GetRadiance(lights[i], closestHit.origin) };
+							finalColor += lightRadiance * BRDFColour * ColorRGB{ observedArea, observedArea, observedArea };
+							break;
+						}
 					}
 
 					if (m_ShadowsEnabled)
@@ -108,7 +106,7 @@ void Renderer::Render(Scene* pScene) const
 						ray.max = directionMagnitude;
 						if (pScene->DoesHit(ray))
 						{
-							finalColor *= 0.5f;
+							finalColor *= 0.9f;
 						}
 					}
 				}

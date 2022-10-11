@@ -126,6 +126,7 @@ namespace dae
 			{
 				const float intensity{ light.intensity };
 				const float sphereRadiusSquared{ (target - light.origin).SqrMagnitude() };
+
 				return light.color * (intensity / sphereRadiusSquared);
 				break;
 			}
