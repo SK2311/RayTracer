@@ -39,7 +39,7 @@ namespace dae
 		static ColorRGB Phong(float ks, float exp, const Vector3& l, const Vector3& v, const Vector3& n)
 		{
 			//todo: W3
-			//assert(false && "Not Implemented Yet");
+			//ALWAYS MAKE SURE THAT THE DOT PRODUCT IS LARGER THAN 0
 			const auto r{ l - (2 * (std::max(0.f, Vector3::Dot(n, l)))) * n };
 			const auto cosAlpha{ std::max(0.f, Vector3::Dot(r, v)) };
 			const auto phong{ ks * (powf(cosAlpha, exp)) };
@@ -57,7 +57,7 @@ namespace dae
 		static ColorRGB FresnelFunction_Schlick(const Vector3& h, const Vector3& v, const ColorRGB& f0)
 		{
 			//todo: W3
-			//assert(false && "Not Implemented Yet");
+			//ALWAYS MAKE SURE THAT THE DOT PRODUCT IS LARGER THAN 0
 			const auto dot{ std::max(0.f, Vector3::Dot(h, v)) };
 			const auto f{ f0 + (ColorRGB{1, 1, 1} - f0) * powf((1 - dot), 5) };
 			return f;
@@ -73,9 +73,9 @@ namespace dae
 		static float NormalDistribution_GGX(const Vector3& n, const Vector3& h, float roughness)
 		{
 			//todo: W3
-			//assert(false && "Not Implemented Yet");
 			const auto alpha{ roughness * roughness };
 			const auto alphaSquared{ alpha * alpha };
+			//ALWAYS MAKE SURE THAT THE DOT PRODUCT IS LARGER THAN 0
 			const auto dot{ std::max(0.f, Vector3::Dot(n, h)) };
 			const auto d{ alphaSquared / (M_PI * Square((Square(dot) * (alphaSquared - 1) + 1))) };
 			return d;
@@ -92,7 +92,7 @@ namespace dae
 		static float GeometryFunction_SchlickGGX(const Vector3& n, const Vector3& v, float roughness)
 		{
 			//todo: W3
-			//assert(false && "Not Implemented Yet");
+			//ALWAYS MAKE SURE THAT THE DOT PRODUCT IS LARGER THAN 0
 			const auto dot{ std::max(0.f, Vector3::Dot(n, v)) };
 			const auto alpha{ roughness * roughness };	
 			const auto k{ Square(alpha + 1) / 8 };

@@ -39,6 +39,7 @@ void Renderer::Render(Scene* pScene) const
 	{
 		for (int py{}; py < m_Height; ++py)
 		{
+			//Convert from raster space to camera space
 			float cx = (((2 * (px + 0.5f) / screenWidth) - 1) * aspectRatio) * fov;
 			float cy = (1 - (2 * (py + 0.5f) / screenHeight)) * fov;
 
@@ -58,12 +59,15 @@ void Renderer::Render(Scene* pScene) const
 			{
 				for (int i{ 0 }; i < lights.size(); ++i)
 				{
+					//cache the directionToLight to be used in multiple LightingModes 
+					//prevents multiple calls to the same function
 					Vector3 directionToLightFunction{ LightUtils::GetDirectionToLight(lights[i], closestHit.origin) };
 
 					switch (m_CurrentLightingMode)
 					{
 						case dae::Renderer::LightingMode::ObservedArea:
 						{
+							//calculate the observed area lighting with Lambert's cosine law
 							float observedArea = Vector3::Dot(closestHit.normal, directionToLightFunction.Normalized());
 							if (observedArea < 0)
 								continue;
