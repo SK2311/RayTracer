@@ -23,20 +23,24 @@ namespace dae
 				float sqrtCalculation{ sqrt(discriminant) };
 				float divider{ (2 * a) };
 
-				float t0{ (-b - sqrtCalculation) / divider };
-				float t1{ (-b + sqrtCalculation) / divider };
-				float t{ (t0 < t1) ? t0 : t1 };
-
-				if (t > ray.min && t < ray.max)
+				float t{ (-b - sqrtCalculation) / divider };
+				if (t < ray.min || t > ray.max)
 				{
-					const Vector3 pointI1{ ray.origin + ray.direction * t };
-					hitRecord.didHit = true;
-					hitRecord.t = t;
-					hitRecord.materialIndex = sphere.materialIndex;
-					hitRecord.origin = pointI1;
-					hitRecord.normal = (pointI1 - sphere.origin).Normalized();
-					return true;
+					t = (-b + sqrtCalculation) / divider;
+
+					if (t < ray.min || t > ray.max)
+					{
+						return false;
+					}
 				}
+
+				const Vector3 pointI1{ ray.origin + ray.direction * t };
+				hitRecord.didHit = true;
+				hitRecord.t = t;
+				hitRecord.materialIndex = sphere.materialIndex;
+				hitRecord.origin = pointI1;
+				hitRecord.normal = (pointI1 - sphere.origin).Normalized();
+				return true;
 			}			
 
 			return false;
@@ -79,7 +83,8 @@ namespace dae
 		inline bool HitTest_Triangle(const Triangle& triangle, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false)
 		{
 			//todo W5
-			assert(false && "No Implemented Yet!");
+			//assert(false && "No Implemented Yet!");
+
 			return false;
 		}
 
@@ -125,7 +130,7 @@ namespace dae
 			case LightType::Point:
 			{
 				const float intensity{ light.intensity };
-				const float sphereRadiusSquared{ (target - light.origin).SqrMagnitude() };
+				const float sphereRadiusSquared{ (light.origin - target).SqrMagnitude() };
 
 				return light.color * (intensity / sphereRadiusSquared);
 				break;

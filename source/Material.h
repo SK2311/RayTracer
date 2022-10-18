@@ -113,8 +113,6 @@ namespace dae
 			//todo: W3
 			//assert(false && "Not Implemented Yet");
 
-			//look and view vector needs to be negative because
-
 			ColorRGB f0{ (m_Metalness == 0) ? ColorRGB{ 0.04f, 0.04f, 0.04f } : m_Albedo };
 
 			const auto halfVector{ (-v - l) / (-v - l).Magnitude() };

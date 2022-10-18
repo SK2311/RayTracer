@@ -62,13 +62,17 @@ void Renderer::Render(Scene* pScene) const
 					//cache the directionToLight to be used in multiple LightingModes 
 					//prevents multiple calls to the same function
 					Vector3 directionToLightFunction{ LightUtils::GetDirectionToLight(lights[i], closestHit.origin) };
+					float distance = directionToLightFunction.Normalize();
+
+					Ray invLightRay{ closestHit.origin, directionToLightFunction, 0.001f, distance };
+					if (m_ShadowsEnabled && pScene->DoesHit(invLightRay)) continue;
 
 					switch (m_CurrentLightingMode)
 					{
 						case dae::Renderer::LightingMode::ObservedArea:
 						{
 							//calculate the observed area lighting with Lambert's cosine law
-							float observedArea = Vector3::Dot(closestHit.normal, directionToLightFunction.Normalized());
+							float observedArea = Vector3::Dot(closestHit.normal, directionToLightFunction);
 							if (observedArea < 0)
 								continue;
 
@@ -84,25 +88,27 @@ void Renderer::Render(Scene* pScene) const
 						}
 						case dae::Renderer::LightingMode::BRDF:
 						{
-							ColorRGB BRDFColour{ materials[closestHit.materialIndex]->Shade(closestHit, -directionToLightFunction.Normalized(), rayDirection) };
+							ColorRGB BRDFColour{ materials[closestHit.materialIndex]->Shade(closestHit, -directionToLightFunction, rayDirection) };
 
 							finalColor += BRDFColour;
 							break;
 						}
 						case dae::Renderer::LightingMode::Combined:
 						{
-							float observedArea = Vector3::Dot(closestHit.normal, directionToLightFunction.Normalized());
+							float observedArea = Vector3::Dot(closestHit.normal, directionToLightFunction);
 							if (observedArea < 0)
 								continue;
 
-							ColorRGB BRDFColour{ materials[closestHit.materialIndex]->Shade(closestHit, -directionToLightFunction.Normalized(), rayDirection) };
+							//inverse direction to get the correct direction from the light to the point
+							//we originally calculate from the point to the light
+							ColorRGB BRDFColour{ materials[closestHit.materialIndex]->Shade(closestHit, -directionToLightFunction, rayDirection) };
 							auto lightRadiance{ LightUtils::GetRadiance(lights[i], closestHit.origin) };
 							finalColor += lightRadiance * BRDFColour * ColorRGB{ observedArea, observedArea, observedArea };
 							break;
 						}
 					}
 
-					if (m_ShadowsEnabled)
+					/*if (m_ShadowsEnabled)
 					{
 						Vector3 directionToLight = directionToLightFunction;
 						const float directionMagnitude = directionToLight.Normalize();
@@ -112,7 +118,7 @@ void Renderer::Render(Scene* pScene) const
 						{
 							finalColor *= 0.9f;
 						}
-					}
+					}*/
 				}
 			}
 

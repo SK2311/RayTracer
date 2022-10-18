@@ -56,6 +56,19 @@ namespace dae {
 				closestHit.origin = tempHitRecord.origin;
 			}
 		}
+
+		for (const Triangle& triangle : m_Triangles)
+		{
+			GeometryUtils::HitTest_Triangle(triangle, ray, tempHitRecord);
+			if (tempHitRecord.t < closestHit.t)
+			{
+				closestHit.t = tempHitRecord.t;
+				closestHit.didHit = tempHitRecord.didHit;
+				closestHit.materialIndex = tempHitRecord.materialIndex;
+				closestHit.normal = tempHitRecord.normal;
+				closestHit.origin = tempHitRecord.origin;
+			}
+		}
 	}
 
 	bool Scene::DoesHit(const Ray& ray) const
@@ -256,5 +269,33 @@ namespace dae {
 
 		AddPointLight({ 0.0f, 5.0f, 5.0f }, 25.0f, colors::White);
 		AddPointLight({ 0.0f, 2.5f, -5.0f }, 25.0f, colors::White);
+	}
+	void Scene_W4_TestScene::Initialize()
+	{
+		m_Camera.origin = { 0.f,1.f,-5.f };
+		m_Camera.fovAngle = 45.f;
+
+		//Materials
+		const auto matLambert_GrayBlue = AddMaterial(new Material_Lambert({ 0.49f, 0.57f, 0.57 }, 1.f));
+		const auto matLambert_White = AddMaterial(new Material_Lambert(colors::White, 1.f));
+
+		//Planes
+		AddPlane(Vector3{ 0.f,0.f,10.f }, Vector3{ 0.f,0.f,-1.f }, matLambert_GrayBlue); //Back
+		AddPlane(Vector3{ 0.f,0.f,0.f }, Vector3{ 0.f,1.f,0.f }, matLambert_GrayBlue); //Bottom
+		AddPlane(Vector3{ 0.f,10.f,0.f }, Vector3{ 0.f,-1.f,0.f }, matLambert_GrayBlue); //Top
+		AddPlane(Vector3{ 5.f,0.f,0.f }, Vector3{ -1.f,0.f,0.f }, matLambert_GrayBlue); //Right
+		AddPlane(Vector3{ -5.f,0.f,0.f }, Vector3{ 1.f,0.f,0.f }, matLambert_GrayBlue); //Left
+
+		//Triangle (temp)
+		auto triangle = Triangle{ {-0.75f, 0.5f, 0.f}, {-0.75f, 2.f, 0.f}, {0.75f, 0.5f, 0.f} };
+		triangle.cullMode = TriangleCullMode::NoCulling;
+		triangle.materialIndex = matLambert_White;
+
+		m_Triangles.emplace_back(triangle);
+
+		//Light
+		AddPointLight(Vector3{ 0.f, 5.f, 5.f }, 50.f, ColorRGB{ 1.f, 0.61f, 0.45f }); //Backlight
+		AddPointLight(Vector3{ -2.5f, 5.f, -5.f }, 70.f, ColorRGB{ 1.f, 0.8f, 0.45f }); //Front left light
+		AddPointLight(Vector3{ 2.5f, 2.5f, -5.f }, 50.f, ColorRGB{ 0.34f, 0.47f, 0.68f });
 	}
 }
