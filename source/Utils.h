@@ -84,8 +84,84 @@ namespace dae
 		{
 			//todo W5
 			//assert(false && "No Implemented Yet!");
+			
+			//using 2 of the triangles vectors, we can get the normal vector
+			Vector3 a { triangle.v1 - triangle.v0 };
+			Vector3 b{ triangle.v2 - triangle.v0 };
+			Vector3 normal{ Vector3::Cross(a,b) };
 
-			return false;
+			switch (triangle.cullMode)
+			{
+			case TriangleCullMode::FrontFaceCulling:
+				//check if we are hitting the front face
+				if (!ignoreHitRecord)
+				{
+					if (Vector3::Dot(normal, ray.direction) < 0)
+						return false;
+				}
+				else
+				{
+					if (Vector3::Dot(normal, ray.direction) > 0)
+						return false;
+				}
+				break;
+			case TriangleCullMode::BackFaceCulling:
+				//check if we are hitting the back face
+				if (!ignoreHitRecord)
+				{
+					if (Vector3::Dot(normal, ray.direction) > 0)
+						return false;
+				}
+				else
+				{
+					if (Vector3::Dot(normal, ray.direction) < 0)
+						return false;
+				}
+				break;
+			case TriangleCullMode::NoCulling:
+				//if the normal and the view direction are perpendicular, return false
+				if (Vector3::Dot(normal, ray.direction) == 0)
+					return false;
+				break;
+			default:
+				break;
+			}
+
+			Vector3 center{ (triangle.v0 + triangle.v1 + triangle.v2) / 3 };
+			Vector3 L{ center - ray.origin };
+			float t{ Vector3::Dot(L, normal) / Vector3::Dot(ray.direction, normal) };
+
+			if (t < ray.min || t > ray.max)
+				return false;
+
+			//hitpoint of ray on the plane
+			Vector3 p{ ray.origin + ray.direction * t };
+
+			//get the other 2 edges of the triangle edgeA is the same as variable a, so no need to calculate it again
+			//Vector3 edgeA{ triangle.v1 - triangle.v0 };
+			Vector3 edgeB{ triangle.v2 - triangle.v1 };
+			Vector3 edgeC{ triangle.v0 - triangle.v2 };
+
+			//check if point is inside of the triangle by checking if the point is on the correct side of the triangle edges
+			Vector3 pointToSide{ p - triangle.v0 };
+			if (Vector3::Dot(normal, Vector3::Cross(a, pointToSide)) < 0)
+				return false;
+
+			pointToSide = p - triangle.v1;
+			if (Vector3::Dot(normal, Vector3::Cross(edgeB, pointToSide)) < 0)
+				return false;
+
+			pointToSide = p - triangle.v2;
+			if (Vector3::Dot(normal, Vector3::Cross(edgeC, pointToSide)) < 0)
+				return false;
+
+			//if the point is in the trianlge, fill in the hitrecord and return true
+			hitRecord.didHit = true;
+			hitRecord.t = t;
+			hitRecord.materialIndex = triangle.materialIndex;
+			hitRecord.origin = p;
+			hitRecord.normal = triangle.normal;
+			return true;
 		}
 
 		inline bool HitTest_Triangle(const Triangle& triangle, const Ray& ray)

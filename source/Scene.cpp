@@ -87,6 +87,12 @@ namespace dae {
 			if (GeometryUtils::HitTest_Plane(plane, ray))
 				return true;
 		}
+
+		for (const Triangle& triangle : m_Triangles)
+		{
+			if (GeometryUtils::HitTest_Triangle(triangle, ray))
+				return true;
+		}
 		return false;
 	}
 
@@ -273,6 +279,8 @@ namespace dae {
 	void Scene_W4_TestScene::Initialize()
 	{
 		m_Camera.origin = { 0.f,1.f,-5.f };
+		/*m_Camera.origin = { 0.f,1.f,4.f };
+		m_Camera.totalYaw = 180;*/
 		m_Camera.fovAngle = 45.f;
 
 		//Materials
@@ -288,7 +296,7 @@ namespace dae {
 
 		//Triangle (temp)
 		auto triangle = Triangle{ {-0.75f, 0.5f, 0.f}, {-0.75f, 2.f, 0.f}, {0.75f, 0.5f, 0.f} };
-		triangle.cullMode = TriangleCullMode::NoCulling;
+		triangle.cullMode = TriangleCullMode::BackFaceCulling;
 		triangle.materialIndex = matLambert_White;
 
 		m_Triangles.emplace_back(triangle);
