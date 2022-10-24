@@ -33,8 +33,8 @@ namespace dae
 	struct Triangle
 	{
 		Triangle() = default;
-		Triangle(const Vector3& _v0, const Vector3& _v1, const Vector3& _v2, const Vector3& _normal):
-			v0{_v0}, v1{_v1}, v2{_v2}, normal{_normal.Normalized()}{}
+		Triangle(const Vector3& _v0, const Vector3& _v1, const Vector3& _v2, const Vector3& _normal) :
+			v0{ _v0 }, v1{ _v1 }, v2{ _v2 }, normal{ _normal.Normalized() } {}
 
 		Triangle(const Vector3& _v0, const Vector3& _v1, const Vector3& _v2) :
 			v0{ _v0 }, v1{ _v1 }, v2{ _v2 }
@@ -57,8 +57,8 @@ namespace dae
 	struct TriangleMesh
 	{
 		TriangleMesh() = default;
-		TriangleMesh(const std::vector<Vector3>& _positions, const std::vector<int>& _indices, TriangleCullMode _cullMode):
-		positions(_positions), indices(_indices), cullMode(_cullMode)
+		TriangleMesh(const std::vector<Vector3>& _positions, const std::vector<int>& _indices, TriangleCullMode _cullMode) :
+			positions(_positions), indices(_indices), cullMode(_cullMode)
 		{
 			//Calculate Normals
 			CalculateNormals();
@@ -78,7 +78,7 @@ namespace dae
 		std::vector<int> indices{};
 		unsigned char materialIndex{};
 
-		TriangleCullMode cullMode{TriangleCullMode::BackFaceCulling};
+		TriangleCullMode cullMode{ TriangleCullMode::BackFaceCulling };
 
 		Matrix rotationTransform{};
 		Matrix translationTransform{};
@@ -117,15 +117,39 @@ namespace dae
 			normals.push_back(triangle.normal);
 
 			//Not ideal, but making sure all vertices are updated
-			if(!ignoreTransformUpdate)
+			if (!ignoreTransformUpdate)
 				UpdateTransforms();
 		}
 
 		void CalculateNormals()
 		{
-			assert(false && "No Implemented Yet!");
+			//assert(false && "No Implemented Yet!");
 
+			//a=v1-v0
+				// b=v2-v0
+				// normal = cross(a,b)
+				// 
+				// v0, is the first index of the triangle
+				// v1, is the second index of the triangle
+				// v2, is the third index of the triangle
+				//
 
+			int nrOfIndices{ (int)indices.size() };
+			for (int i{}; i < nrOfIndices; ++i)
+			{
+				if (i > 0 && i % 3 == 0)
+				{
+					Vector3 v0 = positions[indices[i - 3]];
+					Vector3 v1 = positions[indices[i - 2]];;
+					Vector3 v2 = positions[indices[i - 1]];;
+
+					Vector3 a = v1 - v0;
+					Vector3 b = v2 - v0;
+
+					Vector3 normal{ Vector3::Cross(a,b) };
+					normals.push_back(normal);
+				}
+			}
 		}
 
 		void UpdateTransforms()

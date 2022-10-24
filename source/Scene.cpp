@@ -57,9 +57,9 @@ namespace dae {
 			}
 		}
 
-		for (const Triangle& triangle : m_Triangles)
+		for (const TriangleMesh& triangleMesh : m_TriangleMeshGeometries)
 		{
-			GeometryUtils::HitTest_Triangle(triangle, ray, tempHitRecord);
+			GeometryUtils::HitTest_TriangleMesh(triangleMesh, ray);
 			if (tempHitRecord.t < closestHit.t)
 			{
 				closestHit.t = tempHitRecord.t;
@@ -88,9 +88,9 @@ namespace dae {
 				return true;
 		}
 
-		for (const Triangle& triangle : m_Triangles)
+		for (const TriangleMesh& triangleMesh : m_TriangleMeshGeometries)
 		{
-			if (GeometryUtils::HitTest_Triangle(triangle, ray))
+			if (GeometryUtils::HitTest_TriangleMesh(triangleMesh, ray))
 				return true;
 		}
 		return false;
@@ -295,11 +295,21 @@ namespace dae {
 		AddPlane(Vector3{ -5.f,0.f,0.f }, Vector3{ 1.f,0.f,0.f }, matLambert_GrayBlue); //Left
 
 		//Triangle (temp)
-		auto triangle = Triangle{ {-0.75f, 0.5f, 0.f}, {-0.75f, 2.f, 0.f}, {0.75f, 0.5f, 0.f} };
+		/*auto triangle = Triangle{ {-0.75f, 0.5f, 0.f}, {-0.75f, 2.f, 0.f}, {0.75f, 0.5f, 0.f} };
 		triangle.cullMode = TriangleCullMode::BackFaceCulling;
 		triangle.materialIndex = matLambert_White;
 
-		m_Triangles.emplace_back(triangle);
+		m_Triangles.emplace_back(triangle);*/
+
+		//Triangle Mesh
+		const auto triangleMesh = AddTriangleMesh(TriangleCullMode::NoCulling, matLambert_White);
+		triangleMesh->positions = { {-0.75f, -1.0f, 0.0f}, {-0.75f, 1.0f, 0.0f}, {0.75f, 1.0f, 1.0f}, {0.75f, -1.0f, 0.0f} };
+		triangleMesh->indices = {
+			0,1,2,
+			0,2,3
+		};
+
+		triangleMesh->CalculateNormals();
 
 		//Light
 		AddPointLight(Vector3{ 0.f, 5.f, 5.f }, 50.f, ColorRGB{ 1.f, 0.61f, 0.45f }); //Backlight
