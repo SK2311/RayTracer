@@ -42,7 +42,7 @@ int main(int argc, char* args[])
 		return 1;
 
 	//Initialize "framework"
-	const auto pTimer = new Timer();
+	/*const*/ auto pTimer = new Timer();
 	const auto pRenderer = new Renderer(pWindow);
 
 	//const auto pScene = new Scene_W1();
@@ -50,8 +50,8 @@ int main(int argc, char* args[])
 	//const auto pScene = new Scene_W3();
 	//const auto pScene = new Scene_W3_TestScene();
 	//const auto pScene = new Scene_W4_TestScene();
-	//const auto pScene = new Scene_W4_ReferenceScene();
-	const auto pScene = new Scene_W4_BunnyScene();
+	const auto pScene = new Scene_W4_ReferenceScene();
+	//const auto pScene = new Scene_W4_BunnyScene();
 
 	pScene->Initialize();
 
@@ -78,6 +78,8 @@ int main(int argc, char* args[])
 					pRenderer->ToggleShadows();
 				if (e.key.keysym.scancode == SDL_SCANCODE_F3)
 					pRenderer->CycleLightingMode();
+				if (e.key.keysym.scancode == SDL_SCANCODE_F6)
+					pTimer->StartBenchmark();
 				break;
 			}
 		}
