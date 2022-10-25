@@ -86,9 +86,11 @@ namespace dae
 			//assert(false && "No Implemented Yet!");
 			
 			//using 2 of the triangles vectors, we can get the normal vector
-			Vector3 a { triangle.v1 - triangle.v0 };
+			/*Vector3 a { triangle.v1 - triangle.v0 };
 			Vector3 b{ triangle.v2 - triangle.v0 };
-			Vector3 normal{ Vector3::Cross(a,b) };
+			Vector3 normal{ Vector3::Cross(a,b) };*/
+
+			Vector3 normal{ triangle.normal };
 
 			switch (triangle.cullMode)
 			{
@@ -138,13 +140,13 @@ namespace dae
 			Vector3 p{ ray.origin + ray.direction * t };
 
 			//get the other 2 edges of the triangle edgeA is the same as variable a, so no need to calculate it again
-			//Vector3 edgeA{ triangle.v1 - triangle.v0 };
+			Vector3 edgeA{ triangle.v1 - triangle.v0 };
 			Vector3 edgeB{ triangle.v2 - triangle.v1 };
 			Vector3 edgeC{ triangle.v0 - triangle.v2 };
 
 			//check if point is inside of the triangle by checking if the point is on the correct side of the triangle edges
 			Vector3 pointToSide{ p - triangle.v0 };
-			if (Vector3::Dot(normal, Vector3::Cross(a, pointToSide)) < 0)
+			if (Vector3::Dot(normal, Vector3::Cross(edgeA, pointToSide)) < 0)
 				return false;
 
 			pointToSide = p - triangle.v1;
@@ -175,35 +177,31 @@ namespace dae
 		{
 			//todo W5
 			//assert(false && "No Implemented Yet!");
-
-			auto triangle = Triangle{};
-			int nrOfTriangles{ (int)mesh.normals.size() };
-			Vector3 v0{};
-			Vector3 v1{};
-			Vector3 v2{};
-
-			bool hitTriangleMesh{ false };
 			
+			auto triangle = Triangle{};
+			int nrOfTriangles{ (int)mesh.transformedNormals.size() };
+			HitRecord closestHit{};
+
 			for (int i{}; i < nrOfTriangles; ++i)
 			{
-				int nrOfIndices{ (int)mesh.indices.size() };
-				for (int i{}; i < nrOfIndices; ++i)
-				{
-					if (i > 0 && i % 3 == 0)
-					{
-						triangle.v0 = mesh.positions[mesh.indices[i - 3]];
-						triangle.v1 = mesh.positions[mesh.indices[i - 2]];;
-						triangle.v2 = mesh.positions[mesh.indices[i - 1]];;
-					}
-				}
+				triangle.v0 = mesh.transformedPositions[mesh.indices[i * 3]];
+				triangle.v1 = mesh.transformedPositions[mesh.indices[i * 3 + 1]];
+				triangle.v2 = mesh.transformedPositions[mesh.indices[i * 3 + 2]];
 
+				triangle.normal = mesh.transformedNormals[i];
 				triangle.cullMode = mesh.cullMode;
 				triangle.materialIndex = mesh.materialIndex;
 
-				hitTriangleMesh = HitTest_Triangle(triangle, ray, hitRecord, ignoreHitRecord);
+				if (HitTest_Triangle(triangle, ray, hitRecord, ignoreHitRecord))
+				{
+					if (closestHit.t > hitRecord.t)
+						closestHit = hitRecord;
+				}
 			}
 
-			return hitTriangleMesh;
+			hitRecord = closestHit;
+
+			return closestHit.didHit;
 		}
 
 		inline bool HitTest_TriangleMesh(const TriangleMesh& mesh, const Ray& ray)

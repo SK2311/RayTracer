@@ -1,8 +1,8 @@
 #pragma once
 #include <cassert>
-
 #include "Math.h"
 #include "vector"
+#include <iostream>
 
 namespace dae
 {
@@ -135,26 +135,24 @@ namespace dae
 				//
 
 			int nrOfIndices{ (int)indices.size() };
-			for (int i{}; i < nrOfIndices; ++i)
+			for (int i{3}; i <= nrOfIndices; i+=3)
 			{
-				if (i > 0 && i % 3 == 0)
-				{
-					Vector3 v0 = positions[indices[i - 3]];
-					Vector3 v1 = positions[indices[i - 2]];;
-					Vector3 v2 = positions[indices[i - 1]];;
+				Vector3 v0 = positions[indices[i - 3]];
+				Vector3 v1 = positions[indices[i - 2]];;
+				Vector3 v2 = positions[indices[i - 1]];;
 
-					Vector3 a = v1 - v0;
-					Vector3 b = v2 - v0;
+				Vector3 a = v1 - v0;
+				Vector3 b = v2 - v0;
 
-					Vector3 normal{ Vector3::Cross(a,b) };
-					normals.push_back(normal);
-				}
+				Vector3 normal{ Vector3::Cross(a,b) };
+				normal.Normalize();
+				normals.push_back(normal);
 			}
 		}
 
 		void UpdateTransforms()
 		{
-			assert(false && "No Implemented Yet!");
+			//assert(false && "No Implemented Yet!");
 			//Calculate Final Transform 
 			//const auto finalTransform = ...
 
@@ -163,6 +161,26 @@ namespace dae
 
 			//Transform Normals (normals > transformedNormals)
 			//...
+
+			//final transfrom = scale * rotation * transform
+
+			//transformedPositions = finalTransform * positions;
+			const auto finalTransform{ scaleTransform * rotationTransform * translationTransform };
+
+			transformedPositions.clear();
+			for (const auto position : positions)
+			{
+				transformedPositions.emplace_back(finalTransform.TransformPoint(position));
+			}
+
+			transformedNormals.clear();
+			for (const auto normal : normals)
+			{
+				transformedNormals.emplace_back(finalTransform.TransformVector(normal));
+			}
+
+			/*transformedPositions = positions;
+			transformedNormals = normals;*/
 		}
 	};
 #pragma endregion
