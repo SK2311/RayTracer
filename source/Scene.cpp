@@ -427,6 +427,8 @@ namespace dae {
 			m_pMesh->indices);
 
 		m_pMesh->Scale({ 2.0f, 2.0f, 2.0f });
+
+		//m_pMesh->UpdateAABB();
 		m_pMesh->UpdateTransforms();
 
 		//Light
@@ -436,6 +438,8 @@ namespace dae {
 	}
 	void Scene_W4_BunnyScene::Update(Timer* pTimer)
 	{
+		Scene::Update(pTimer);
+
 		const auto yawAngle = (cos(pTimer->GetTotal()) + 1.0f) / 2.0f * PI_2;
 		m_pMesh->RotateY(yawAngle);
 		m_pMesh->UpdateTransforms();
