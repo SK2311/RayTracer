@@ -428,7 +428,7 @@ namespace dae {
 
 		m_pMesh->Scale({ 2.0f, 2.0f, 2.0f });
 
-		//m_pMesh->UpdateAABB();
+		m_pMesh->UpdateAABB();
 		m_pMesh->UpdateTransforms();
 
 		//Light
