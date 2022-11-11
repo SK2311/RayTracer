@@ -39,7 +39,7 @@ namespace dae
 				hitRecord.t = t;
 				hitRecord.materialIndex = sphere.materialIndex;
 				hitRecord.origin = pointI1;
-				hitRecord.normal = (pointI1 - sphere.origin).Normalized();
+				hitRecord.normal = (pointI1 - sphere.origin) / sphere.radius;
 				return true;
 			}			
 
@@ -174,13 +174,15 @@ namespace dae
 			Vector3 v0v2 = triangle.v2 - triangle.v0;
 			Vector3 perVec = Vector3::Cross(ray.direction, v0v2);
 
-			float det = Vector3::Dot(v0v1, perVec);
+			float dot = Vector3::Dot(v0v1, perVec);
+
+			Vector3 normal{ triangle.normal };
 
 			//check if the ray is parallel to the triangle, return false if it is
-			if (det < kEpsilon)
+			if (dot < -kEpsilon && dot > kEpsilon)
 				return false;
 
-			float invDet = 1 / det;
+			float invDet = 1 / dot;
 
 			Vector3 tVec = ray.origin - triangle.v0;
 			float u = invDet * Vector3::Dot(tVec, perVec);
@@ -196,7 +198,45 @@ namespace dae
 			if (t < ray.min || t > ray.max)
 				return false;
 
-			if (t > kEpsilon)
+			TriangleCullMode currentCullmode = triangle.cullMode;
+
+			if (ignoreHitRecord)
+			{
+				switch (currentCullmode)
+				{
+				case dae::TriangleCullMode::FrontFaceCulling:
+					currentCullmode = TriangleCullMode::BackFaceCulling;
+					break;
+				case dae::TriangleCullMode::BackFaceCulling:
+					currentCullmode = TriangleCullMode::FrontFaceCulling;
+					break;
+				default:
+					break;
+				}
+			}
+
+			switch (currentCullmode)
+			{
+			case TriangleCullMode::FrontFaceCulling:
+				//check if we are hitting the front face
+				if (Vector3::Dot(normal, ray.direction) < 0)
+					return false;
+				break;
+			case TriangleCullMode::BackFaceCulling:
+				//check if we are hitting the back face
+				if (Vector3::Dot(normal, ray.direction) > 0)
+					return false;
+				break;
+			case TriangleCullMode::NoCulling:
+				//if the normal and the view direction are perpendicular, return false
+				if (Vector3::Dot(normal, ray.direction) == 0)
+					return false;
+				break;
+			default:
+				break;
+			}
+
+			if (t > 0)
 			{
 				Vector3 p{ ray.origin + ray.direction * t };
 

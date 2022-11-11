@@ -76,6 +76,7 @@ namespace dae
 			if (mouseState & SDL_BUTTON(SDL_BUTTON_LEFT) && mouseState & SDL_BUTTON(SDL_BUTTON_RIGHT))
 			{
 				origin += up * (float)-mouseY * deltaTime;
+				CalculateCameraToWorld();
 			}
 			else if (mouseState & SDL_BUTTON(SDL_BUTTON_LEFT))
 			{
@@ -83,6 +84,8 @@ namespace dae
 				totalYaw += yaw;
 
 				origin += forward * (float) - mouseY * movementSpeed * deltaTime;
+
+				CalculateCameraToWorld();
 			}
 			else if (mouseState & SDL_BUTTON(SDL_BUTTON_RIGHT))
 			{
@@ -91,6 +94,8 @@ namespace dae
 
 				totalPitch += pitch;
 				totalYaw += yaw;
+
+				CalculateCameraToWorld();
 			}
 
 			//todo: W2

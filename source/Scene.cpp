@@ -374,16 +374,20 @@ namespace dae {
 		m_pMeshes[0] = AddTriangleMesh(TriangleCullMode::BackFaceCulling, matLambert_White);
 		m_pMeshes[0]->AppendTriangle(baseTriangle, true);
 		m_pMeshes[0]->Translate({ -1.75f, 4.5f, 0.0f });
+		m_pMeshes[0]->UpdateAABB();
 		m_pMeshes[0]->UpdateTransforms();
+
 
 		m_pMeshes[1] = AddTriangleMesh(TriangleCullMode::FrontFaceCulling, matLambert_White);
 		m_pMeshes[1]->AppendTriangle(baseTriangle, true);
 		m_pMeshes[1]->Translate({ 0.0f, 4.5f, 0.0f });
+		m_pMeshes[1]->UpdateAABB();
 		m_pMeshes[1]->UpdateTransforms();
 
 		m_pMeshes[2] = AddTriangleMesh(TriangleCullMode::NoCulling, matLambert_White);
 		m_pMeshes[2]->AppendTriangle(baseTriangle, true);
 		m_pMeshes[2]->Translate({ 1.75f, 4.5f, 0.0f });
+		m_pMeshes[2]->UpdateAABB();
 		m_pMeshes[2]->UpdateTransforms();
 
 		//Lights
@@ -411,7 +415,7 @@ namespace dae {
 
 		//Materials
 		const auto matLambert_GrayBlue = AddMaterial(new Material_Lambert({ 0.49f, 0.57f, 0.57 }, 1.f));
-		const auto matLambert_White = AddMaterial(new Material_Lambert(colors::White, 1.f));
+		const auto matLambert_White = AddMaterial(new Material_Lambert(colors::Gray, 1.f));
 
 		//Planes
 		AddPlane(Vector3{ 0.f,0.f,10.f }, Vector3{ 0.f,0.f,-1.f }, matLambert_GrayBlue); //Back

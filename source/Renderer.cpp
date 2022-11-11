@@ -30,7 +30,7 @@ Renderer::Renderer(SDL_Window* pWindow) :
 void Renderer::Render(Scene* pScene) const
 {
 	Camera& camera = pScene->GetCamera();
-	camera.CalculateCameraToWorld();
+	//camera.CalculateCameraToWorld();
 
 	float aspectRatio{ m_Width / static_cast<float>(m_Height) };
 	float fov{ std::tanf((camera.fovAngle * TO_RADIANS) / 2.f) };
